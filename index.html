@@ -16,28 +16,32 @@
     <link rel="manifest" href='data:application/manifest+json,{"name":"乒乓全能紀錄系統","short_name":"乒乓紀錄","start_url":".","display":"standalone","background_color":"#f4f7f9","theme_color":"#1a73e8","orientation":"portrait","icons":[{"src":"data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%231a73e8%22/><text x=%2210%22 y=%2280%22 font-size=%2275%22>🏓</text></svg>","sizes":"512x512","type":"image/svg+xml"}]}'>
 
     <style>
-        body { font-family: -apple-system, sans-serif; background: #f4f7f9; padding: 15px; color: #333; }
-        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f4f7f9; padding: 15px; color: #333; margin: 0; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
         .header { text-align: center; border-bottom: 2px solid #1a73e8; margin-bottom: 20px; padding-bottom: 10px; }
         .section { margin-bottom: 25px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
         .flex-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; margin: 10px 0; }
-        input, select, button { padding: 10px; border-radius: 8px; border: 1px solid #ddd; font-size: 16px; }
-        button { cursor: pointer; border: none; font-weight: bold; }
+        input, select, button { padding: 10px; border-radius: 8px; border: 1px solid #ddd; font-size: 16px; box-sizing: border-box; }
+        input:focus, select:focus { border-color: #1a73e8; outline: none; }
+        button { cursor: pointer; border: none; font-weight: bold; transition: opacity 0.2s; }
+        button:active { opacity: 0.8; }
         .btn-primary { background: #1a73e8; color: white; }
-        .btn-success { background: #34a853; color: white; width: 100%; margin-top: 10px; height: 45px; }
+        .btn-success { background: #34a853; color: white; width: 100%; margin-top: 10px; height: 45px; font-size: 16px; }
         .btn-danger { background: #ea4335; color: white; padding: 5px 10px; font-size: 12px; }
         .btn-edit { background: #fbbc05; color: black; padding: 5px 10px; font-size: 12px; }
         .player-item { background: #f8f9fa; border: 1px solid #e0e0e0; padding: 8px 12px; border-radius: 10px; display: flex; align-items: center; gap: 8px; margin: 5px; }
         .mode-box { display: flex; background: #eee; border-radius: 10px; padding: 4px; margin-bottom: 15px; }
-        .mode-btn { flex: 1; text-align: center; padding: 10px; cursor: pointer; border-radius: 8px; transition: 0.3s; }
+        .mode-btn { flex: 1; text-align: center; padding: 10px; cursor: pointer; border-radius: 8px; transition: 0.3s; font-weight: bold; color: #666; }
         .mode-btn.active { background: white; color: #1a73e8; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .scroll-x { overflow-x: auto; border-radius: 8px; }
-        table { width: 100%; border-collapse: collapse; text-align: center; font-size: 14px; }
-        th, td { border: 1px solid #eee; padding: 10px; }
-        th { background: #f1f3f4; }
-        .has-val { background: #e6f4ea; font-weight: bold; }
-        .log-box { max-height: 250px; overflow-y: auto; background: #fafafa; border-radius: 8px; padding: 10px; }
-        .log-item { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid #eee; font-size: 13px; }
+        .scroll-x { overflow-x: auto; border-radius: 8px; border: 1px solid #eee; }
+        table { width: 100%; border-collapse: collapse; text-align: center; font-size: 14px; background: white; }
+        th, td { border: 1px solid #eee; padding: 10px; min-width: 60px; }
+        th { background: #f1f3f4; font-weight: bold; }
+        .has-val { background: #e6f4ea; font-weight: bold; color: #137333; }
+        .log-box { max-height: 250px; overflow-y: auto; background: #fafafa; border-radius: 8px; padding: 10px; border: 1px solid #eee; }
+        .log-item { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid #eee; font-size: 13px; gap: 10px; }
+        .log-item:last-child { border-bottom: none; }
+        .team-box { border: 1px solid #ddd; padding: 10px; border-radius: 8px; display: inline-block; background: #fdfdfd; min-width: 120px; }
     </style>
 </head>
 <body>
@@ -45,16 +49,18 @@
 <div class="container">
     <div class="header"><h1>🏓 乒乓全能紀錄系統</h1></div>
 
+    <!-- 1. 球員管理 -->
     <div class="section">
         <h3>1. 球員管理</h3>
         <div class="flex-row">
-            <input type="text" id="newPlayer" placeholder="新球員姓名" style="flex:1">
+            <input type="text" id="newPlayer" placeholder="新球員姓名" style="flex:1" onkeydown="if(event.key==='Enter') addPlayer()">
             <button class="btn-primary" onclick="addPlayer()">加入</button>
             <button onclick="clearAll()" style="background:#666; color:white">全部重置</button>
         </div>
         <div id="playerList" class="flex-row"></div>
     </div>
 
+    <!-- 2. 紀錄比賽 -->
     <div class="section">
         <h3>2. 紀錄比賽</h3>
         <div class="mode-box">
@@ -65,20 +71,23 @@
         <button class="btn-success" onclick="saveMatch()">✅ 紀錄對賽</button>
     </div>
 
+    <!-- 3. 單打統計 -->
     <div class="section">
-        <h3>📊 單打矩陣統計</h3>
+        <h3>📊 單打矩陣統計 (交叉對戰次數)</h3>
         <div class="scroll-x"><table id="matrix"></table></div>
     </div>
 
+    <!-- 4. 雙打排行 -->
     <div class="section">
-        <h3>👫 雙打搭檔排行</h3>
-        <div id="doubleRank" style="text-align:center; color:#888;">暫無紀錄</div>
+        <h3>👫 雙打搭檔出賽排行</h3>
+        <div id="doubleRank" style="text-align:center; color:#888; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px;">暫無紀錄</div>
     </div>
 
+    <!-- 5. 歷史紀錄 -->
     <div class="section" style="border:none">
-        <div style="display:flex; justify-content:space-between; align-items:center">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap: wrap; gap: 10px;">
             <h3>📝 歷史紀錄</h3>
-            <button onclick="exportCSV()" style="background:#fbbc05; padding: 10px 15px; border-radius: 8px;">📥 匯出完整 CSV</button>
+            <button onclick="exportCSV()" style="background:#fbbc05; color: black; padding: 10px 15px; border-radius: 8px;">📥 匯出完整 CSV</button>
         </div>
         <div id="historyLog" class="log-box"></div>
     </div>
@@ -86,25 +95,26 @@
 
 <script>
     // ==========================================
-    // 【整合步驟 2】註冊內嵌式 Service Worker (實現離線可用)
+    // Service Worker PWA 離線優化
     // ==========================================
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            // 將 Service Worker 的邏輯打包成字串並轉為 Blob URL
             const swCode = `
-                const CACHE_NAME = 'pingpong-v11-cache';
+                const CACHE_NAME = 'pingpong-v12-cache';
                 self.addEventListener('install', (e) => {
                     e.waitUntil(
-                        caches.open(CACHE_NAME).then((cache) => {
-                            return cache.addAll(['./', 'index.html']);
-                        }).then(() => self.skipWaiting())
+                        caches.open(CACHE_NAME).then((cache) => cache.addAll(['./', 'index.html']))
+                        .then(() => self.skipWaiting())
                     );
                 });
                 self.addEventListener('activate', (e) => {
-                    e.waitUntil(self.clients.claim());
+                    e.waitUntil(
+                        caches.keys().then((keys) => Promise.all(
+                            keys.map((k) => { if(k !== CACHE_NAME) return caches.delete(k); })
+                        )).then(() => self.clients.claim())
+                    );
                 });
                 self.addEventListener('fetch', (e) => {
-                    // 優先從網路獲取，失敗時（如離線）從快取中讀取
                     e.respondWith(
                         fetch(e.request).catch(() => caches.match(e.request))
                     );
@@ -112,16 +122,14 @@
             `;
             const blob = new Blob([swCode], { type: 'application/javascript' });
             const swUrl = URL.createObjectURL(blob);
-            
-            // 注意：Blob 註冊 SW 有範圍限制，此處主要確保現代瀏覽器能通過 PWA 安裝檢驗
             navigator.serviceWorker.register(swUrl, { scope: './' })
-                .then(reg => console.log('PWA Service Worker 註冊成功'))
-                .catch(err => console.log('PWA Service Worker 註冊失敗: ', err));
+                .then(reg => console.log('PWA Service Worker Ready'))
+                .catch(err => console.log('PWA Error:', err));
         });
     }
 
     // ==========================================
-    // 核心網頁應用程式邏輯
+    // 核心資料與邏輯
     // ==========================================
     let db = JSON.parse(localStorage.getItem('pingpong_v11')) || {
         players: [],
@@ -133,6 +141,16 @@
     };
     let currentMode = 'single';
 
+    // 快取當前下拉選單的選取狀態，防止重新渲染時被洗掉
+    let selectedCache = { s1: '', s2: '', s3: '', s4: '' };
+
+    function saveSelectedCache() {
+        ['s1', 's2', 's3', 's4'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) selectedCache[id] = el.value;
+        });
+    }
+
     function addPlayer() {
         const input = document.getElementById('newPlayer');
         const name = input.value.trim();
@@ -141,6 +159,7 @@
             db.totals[name] = 0;
             db.singleTotals[name] = 0;
             input.value = '';
+            saveSelectedCache();
             refresh();
         }
     }
@@ -156,6 +175,7 @@
                 if(l.p3 === oldName) l.p3 = trimmedName;
                 if(l.p4 === oldName) l.p4 = trimmedName;
             });
+            saveSelectedCache();
             recalculateStats();
             refresh();
         }
@@ -165,6 +185,7 @@
         if (confirm(`確定要刪除「${name}」嗎？相關紀錄會被過濾！`)) {
             db.players = db.players.filter(p => p !== name);
             db.logs = db.logs.filter(l => l.p1 !== name && l.p2 !== name && l.p3 !== name && l.p4 !== name);
+            saveSelectedCache();
             recalculateStats();
             refresh();
         }
@@ -181,10 +202,8 @@
             
             if (l.mode === 'single') {
                 if (p1Exist && p2Exist) {
-                    db.totals[l.p1]++;
-                    db.totals[l.p2]++;
-                    db.singleTotals[l.p1]++;
-                    db.singleTotals[l.p2]++;
+                    db.totals[l.p1]++; db.totals[l.p2]++;
+                    db.singleTotals[l.p1]++; db.singleTotals[l.p2]++;
                     const key = [l.p1, l.p2].sort().join(" v ");
                     db.vs[key] = (db.vs[key] || 0) + 1;
                 }
@@ -203,6 +222,7 @@
     }
 
     function switchMode(m) {
+        saveSelectedCache();
         currentMode = m;
         document.getElementById('mSingle').className = m === 'single' ? 'mode-btn active' : 'mode-btn';
         document.getElementById('mDouble').className = m === 'double' ? 'mode-btn active' : 'mode-btn';
@@ -215,14 +235,32 @@
             area.innerHTML = `<span style="color:#999;font-size:14px;">請先在上方加入球員</span>`;
             return;
         }
-        const opt = db.players.map(p => `<option value="${p}">${p}</option>`).join('');
+
+        const createSelect = (id, defaultIdx) => {
+            let optionsHtml = db.players.map(p => `<option value="${p}">${p}</option>`).join('');
+            return `<select id="${id}" onchange="saveSelectedCache()">${optionsHtml}</select>`;
+        };
+
         if (currentMode === 'single') {
-            area.innerHTML = `<select id="s1">${opt}</select> <b>VS</b> <select id="s2">${opt}</select>`;
+            area.innerHTML = `${createSelect('s1')} <b>VS</b> ${createSelect('s2')}`;
         } else {
-            area.innerHTML = `<div style="border:1px solid #ddd;padding:8px;border-radius:8px;display:inline-block;">A組:<br><select id="s1">${opt}</select><br><select id="s2">${opt}</select></div>
-                             <b>VS</b>
-                             <div style="border:1px solid #ddd;border-radius:8px;display:inline-block;">B組:<br><select id="s3">${opt}</select><br><select id="s4">${opt}</select></div>`;
+            area.innerHTML = `
+                <div class="team-box"><b>A組搭檔</b><br>${createSelect('s1')}<br><div style="margin-top:5px;"></div>${createSelect('s2')}</div>
+                <b style="font-size:18px;">VS</b>
+                <div class="team-box"><b>B組搭檔</b><br>${createSelect('s3')}<br><div style="margin-top:5px;"></div>${createSelect('s4')}</div>`;
         }
+
+        // 還原先前選取的值，若無快取或球員被刪，則自動派發不重複的預設值
+        ['s1', 's2', 's3', 's4'].forEach((id, idx) => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            if (selectedCache[id] && db.players.includes(selectedCache[id])) {
+                el.value = selectedCache[id];
+            } else {
+                // 自動防呆：預設選取不重複的候選人
+                el.value = db.players[Math.min(idx, db.players.length - 1)] || db.players[0];
+            }
+        });
     }
 
     function saveMatch() {
@@ -253,6 +291,7 @@
 
     function deleteLog(id) {
         if (confirm("確定撤銷這場對賽？")) {
+            saveSelectedCache();
             db.logs = db.logs.filter(l => l.id !== id);
             recalculateStats();
             refresh();
@@ -263,18 +302,20 @@
         localStorage.setItem('pingpong_v11', JSON.stringify(db));
         renderInputs();
         
+        // 球員名單渲染
         document.getElementById('playerList').innerHTML = db.players.length ? db.players.map(p => `
             <div class="player-item">
-                <b>${p}</b> <span>(單:${db.singleTotals[p] || 0}/總:${db.totals[p] || 0})</span>
+                <b>${p}</b> <span style="color:#666; font-size:13px;">(單:${db.singleTotals[p] || 0}/總:${db.totals[p] || 0})</span>
                 <button class="btn-edit" onclick="editPlayer('${p}')">改名</button>
-                <button class="btn-danger" onclick="deletePlayer('${p}')">刪</button>
+                <button class="btn-danger" onclick="deletePlayer('${p}')">刪除</button>
             </div>`).join('') : '<span style="color:#888;font-size:14px;margin:10px;">目前沒有球員，請從上方新增。</span>';
 
+        // 對賽交叉矩陣
         let mHtml = '<tr><th></th>' + db.players.map(p => `<th>${p}</th>`).join('') + '</tr>';
         db.players.forEach(r => {
             mHtml += `<tr><td><b>${r}</b></td>`;
             db.players.forEach(c => {
-                if(r===c) mHtml += '<td>-</td>';
+                if(r===c) mHtml += '<td style="color:#ccc; background:#fafafa;">-</td>';
                 else {
                     const count = db.vs[[r, c].sort().join(" v ")] || 0;
                     mHtml += `<td class="${count>0?'has-val':''}">${count}</td>`;
@@ -284,21 +325,23 @@
         });
         document.getElementById('matrix').innerHTML = db.players.length ? mHtml : '<tr><td style="color:#888;padding:20px;">請先加入球員</td></tr>';
 
+        // 雙打排行
         const pairArr = Object.entries(db.pairs).sort((a,b)=>b[1]-a[1]);
         document.getElementById('doubleRank').innerHTML = pairArr.length ? 
-            pairArr.map(e => `<span style="display:inline-block; margin:5px; padding:5px 10px; background:#fff3e0; border-radius:15px; font-size:13px">🏆 ${e[0]}：${e[1]} 次</span>`).join('') : "暫無紀錄";
+            pairArr.map(e => `<span style="display:inline-block; padding:6px 12px; background:#fff3e0; border:1px solid #ffe0b2; border-radius:15px; font-size:13px; color:#e65100"><b>🏆 ${e[0]}</b>：${e[1]} 次</span>`).join('') : "暫無紀錄";
 
+        // 歷史紀錄
         document.getElementById('historyLog').innerHTML = db.logs.length ? db.logs.map(l => {
             let matchText = "";
             if (l.mode === 'single') {
                 matchText = `<b style="color:#1a73e8">${l.p1}</b> <span style="color:#999">VS</span> <b style="color:#1a73e8">${l.p2}</b>`;
             } else {
-                matchText = `<span style="background:#e8f0fe;padding:2px 6px;border-radius:4px;">${l.p1} & ${l.p2}</span> <span style="color:#999">VS</span> <span style="background:#e8f0fe;padding:2px 6px;border-radius:4px;">${l.p3} & ${l.p4}</span>`;
+                matchText = `<span style="background:#e8f0fe;padding:3px 6px;border-radius:4px;font-weight:500;">${l.p1} & ${l.p2}</span> <span style="color:#999">VS</span> <span style="background:#e8f0fe;padding:3px 6px;border-radius:4px;font-weight:500;">${l.p3} & ${l.p4}</span>`;
             }
             return `
             <div class="log-item">
                 <span><span style="font-weight:bold;color:${l.mode==='single'?'#1a73e8':'#34a853'}">[${l.mode==='single'?'單':'雙'}]</span> ${matchText}</span>
-                <div><small style="color:#999; margin-right:8px">${l.time}</small>
+                <div style="display:flex; align-items:center; gap:8px;"><small style="color:#999; white-space:nowrap;">${l.time}</small>
                 <button class="btn-danger" onclick="deleteLog(${l.id})">撤銷</button></div>
             </div>`;
         }).join('') : '<div style="text-align:center;color:#888;padding:15px;">暫無對賽紀錄</div>';
@@ -323,7 +366,7 @@
         Object.entries(db.pairs).forEach(e => csv += `"${e[0]}",${e[1]}\n`);
 
         csv += "\n全歷史紀錄\n時間,模式,P1,P2,P3,P4\n";
-        db.logs.forEach(l => csv += `${l.time},${l.mode==='single'?'單打':'雙打'},${l.p1},${l.p2},${l.p3||''},${l.p4||''}\n`);
+        db.logs.forEach(l => csv += `"${l.time}",${l.mode==='single'?'單打':'雙打'},${l.p1},${l.p2},${l.p3||''},${l.p4||''}\n`);
         
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const a = document.createElement("a");
@@ -333,6 +376,8 @@
     }
 
     function clearAll() { if(confirm("確定清除所有球員及歷史紀錄？此操作無法還原！")) { localStorage.clear(); location.reload(); } }
+    
+    // 初始化
     refresh();
 </script>
 </body>
